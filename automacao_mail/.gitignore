@@ -1,0 +1,16 @@
+.env
+.env.*
+!.env.example
+
+# Chaves (ex.: PuTTY / SSH)
+*.ppk
+*.pem
+id_rsa
+id_ed25519
+
+# Saída e caches
+saida/
+__pycache__/
+*.py[cod]
+.venv/
+venv/

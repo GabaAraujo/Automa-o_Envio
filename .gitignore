@@ -1,0 +1,29 @@
+# Segredos e ambiente local
+.env
+.env.*
+!.env.example
+
+# Chaves e certificados (nunca no repositório)
+*.ppk
+*.pem
+id_rsa
+id_rsa.pub
+id_ed25519
+id_ed25519.pub
+*.p12
+*.pfx
+
+# Saída gerada e artefatos locais
+automacao_mail/saida/
+**/__pycache__/
+*.py[cod]
+.venv/
+venv/
+.Python
+
+# IDEs e SO
+.idea/
+.vscode/
+*.swp
+.DS_Store
+Thumbs.db

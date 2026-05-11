@@ -1,0 +1,39 @@
+DECLARE @InicioOntem DATETIME;
+DECLARE @FimOntem    DATETIME;
+
+SET @InicioOntem = DATEADD(DAY, DATEDIFF(DAY, 1, GETDATE()), 0);
+SET @FimOntem    = DATEADD(DAY, DATEDIFF(DAY, 0, GETDATE()), 0);
+
+SELECT
+    b.data                          AS data_vistoria,
+    b.hora                          AS hora_vistoria,
+    b.id_tipo_operacao,
+    CASE b.id_tipo_operacao
+        WHEN 52    THEN N'INSTALAÇÃO'
+        WHEN 49    THEN N'DESINSTALAÇÃO'
+        WHEN 57    THEN N'MANUTENÇÃO'
+        WHEN 75397 THEN N'RETIRADA'
+        ELSE CAST(b.id_tipo_operacao AS VARCHAR(20))
+    END                             AS tipo_operacao,
+    b.placa                         AS TAG,
+    v.placa_veiculo                 AS placa_veiculo,
+    v.tecnico_executante_1,
+    v.tecnico_executante_2,
+    v.tecnico_executante_3,
+    b.vistoriador_uf                AS estado,
+    b.cliente                       AS cliente,
+    b.url_download                  AS url_download,
+    b.nome_veiculo                  AS veiculo,
+    v.tipo_de_contrato              AS tipo_contrato,
+    v.tipo_equipamento              AS tipo_equipamento
+
+FROM BMCLIENTES.dbo.valores_dinamicos v
+INNER JOIN BMCLIENTES.dbo.BdVexSoft b
+    ON v.id_bdvexsoft = b.id
+
+WHERE
+    -- ✅ D‑1: ONTEM COMPLETO
+    b.data >= @InicioOntem
+    AND b.data <  @FimOntem
+  
+    AND v.tipo_equipamento = N'Caminhão Comboio'
