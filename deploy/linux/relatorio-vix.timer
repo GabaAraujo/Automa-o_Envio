@@ -1,11 +1,12 @@
-# Todos os dias às 07:00 no fuso do sistema (veja: timedatectl).
-# Para outro horário, altere OnCalendar (ex.: *-*-* 06:30:00).
+# Dispara todo dia às 07:00 em Brasília (America/Sao_Paulo), mesmo se a VM estiver em UTC.
+# Antes: 07:00 UTC ≈ 04:00 em SP — por isso o e-mail “ia às 4 da manhã” no Brasil.
+# Ajuste o horário ou o fuso abaixo se a equipe for de outra região.
 
 [Unit]
-Description=Agenda diária — Relatório Vix (07:00)
+Description=Agenda diária — Relatório Vix (07:00 America/Sao_Paulo)
 
 [Timer]
-OnCalendar=*-*-* 07:00:00
+OnCalendar=*-*-* 07:00:00 America/Sao_Paulo
 Persistent=true
 
 [Install]
