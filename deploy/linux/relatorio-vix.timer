@@ -1,0 +1,12 @@
+# Todos os dias às 07:00 no fuso do sistema (veja: timedatectl).
+# Para outro horário, altere OnCalendar (ex.: *-*-* 06:30:00).
+
+[Unit]
+Description=Agenda diária — Relatório Vix (07:00)
+
+[Timer]
+OnCalendar=*-*-* 07:00:00
+Persistent=true
+
+[Install]
+WantedBy=timers.target

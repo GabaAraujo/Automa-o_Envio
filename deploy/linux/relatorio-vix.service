@@ -1,0 +1,18 @@
+# Copie para /etc/systemd/system/ e ajuste User + caminhos absolutos.
+# Depois: sudo systemctl daemon-reload && sudo systemctl enable --now relatorio-vix.timer
+#
+# O .env em automacao_mail/ é carregado pelo próprio Python (python-dotenv).
+
+[Unit]
+Description=Relatório Vix — gera Excel e envia e-mail
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=ubuntu
+WorkingDirectory=/opt/relatorio-vix/Automa-o_Envio/automacao_mail
+ExecStart=/opt/relatorio-vix/Automa-o_Envio/automacao_mail/scripts/run_relatorio.sh
+
+[Install]
+WantedBy=multi-user.target

@@ -83,48 +83,53 @@ Automação em **servidor AWS EC2** para:
 
 ---
 
-## Variáveis de ambiente (rascunho — preencher)
+## Variáveis de ambiente (referência — nomes usados no código)
 
-Documente aqui os nomes reais usados no código quando definidos.
+Valores reais ficam em **`.env`** (local ou variáveis do sistema na EC2). Modelo versionado: **`.env.example`** (sem segredos). Leitura: `config.load_env()` em `config.py` (carrega `automacao_mail/.env` e, se existir, `.env` na pasta pai do projeto).
 
-| Variável | Descrição |
-|----------|-----------|
-| `MSSQL_ODBC_DRIVER` | Nome do driver ODBC (ex.: `SQL Server`, `ODBC Driver 17 for SQL Server`) |
-| `MSSQL_SERVER` | Host ou IP do SQL Server |
-| `MSSQL_DATABASE` | Banco (ex.: `BMCLIENTES`) |
-| `MSSQL_USER` / `MSSQL_PASSWORD` | Credenciais SQL |
-| `MSSQL_ODBC_CONNECTION_STRING` | Alternativa: string ODBC completa (sobrepõe os campos acima) |
-| `REPORT_OUTPUT_DIR` | Pasta de saída dos `.xlsx` (padrão: `automacao_mail/saida/`) |
-| `SMTP_HOST` | Servidor SMTP |
-| `SMTP_PORT` | Porta (ex.: **587** STARTTLS, **465** SSL implícito) |
-| `SMTP_USE_TLS` | `true`/`false` — STARTTLS após conectar (típico na 587) |
-| `SMTP_USE_SSL` | `true`/`false` — conexão SSL desde o início (típico na 465) |
-| `SMTP_USER` / `SMTP_PASSWORD` | Autenticação SMTP (se vazio, tenta enviar sem login — raro) |
-| `MAIL_FROM` | Endereço remetente |
-| `MAIL_TO` | Destinatários (vírgula ou ponto e vírgula) |
-| `MAIL_CC` / `MAIL_BCC` | Opcional |
-| `MAIL_ATTACH_EXTRA` | Somente em `python email_send.py`: caminhos extras de anexo (vírgula) |
+| Variável | Descrição | Onde é lida |
+|----------|-----------|-------------|
+| `MSSQL_ODBC_DRIVER` | Nome do driver ODBC (padrão no código: `ODBC Driver 17 for SQL Server`) | `config.py` → `connection_string()` |
+| `MSSQL_SERVER` | Host ou IP do SQL Server | idem |
+| `MSSQL_DATABASE` | Banco (padrão `BMCLIENTES`) | idem |
+| `MSSQL_USER` | Usuário SQL | idem |
+| `MSSQL_PASSWORD` | Senha SQL | idem |
+| `MSSQL_ODBC_CONNECTION_STRING` | String ODBC completa; se definida, **substitui** os campos acima | idem |
+| `REPORT_OUTPUT_DIR` | Pasta de saída dos `.xlsx` (vazio = `automacao_mail/saida/`) | `config.py` → `get_output_dir()` |
+| `SMTP_HOST` | Servidor SMTP | `email_send.py` → `load_smtp_config()` |
+| `SMTP_PORT` | Porta (padrão `587`) | idem |
+| `SMTP_USE_TLS` | `true`/`false` — STARTTLS (típico na 587) | idem |
+| `SMTP_USE_SSL` | `true`/`false` — SSL desde o início (típico na 465) | idem |
+| `SMTP_USER` | Usuário SMTP | idem |
+| `SMTP_PASSWORD` | Senha SMTP (espaços são ignorados na junção) | idem |
+| `MAIL_FROM` | Remetente | idem |
+| `MAIL_TO` | Destinatários (vírgula ou `;`) | idem |
+| `MAIL_CC` / `MAIL_BCC` | Cópia opcional | idem |
+| `MAIL_ATTACH_EXTRA` | Anexos extras (caminhos separados por vírgula); uso em `python email_send.py` | `email_send.py` |
 
 ---
 
 ## Estrutura de pastas (atual)
 
 ```
-automacao_mail/
-├── CONTEXTO.md
-├── main.py           ← orquestração (CLI)
-├── config.py         ← paths, load_dotenv, connection_string
-├── database.py       ← prepare_sql, run_query
-├── excel_export.py   ← prepare_detail_dataframe, abas Detalhe + Resumo
-├── email_send.py     ← SMTP, anexos .xlsx, corpo texto
-├── requirements.txt
-├── .env              ← credenciais (não versionar)
-├── saida/            ← relatórios gerados (relatorio_d-1.xlsx, relatorio_d-30.xlsx)
-└── ...
-
-../Consultas/
-├── d-1               ← SQL: dia anterior
-└── d-30              ← SQL: janela 16–15
+<raiz do repositório Git>/
+├── .gitignore              ← ignora .env, *.ppk, chaves, saida/, venv, etc.
+├── Consultas/
+│   ├── d-1                 ← SQL: dia anterior
+│   └── d-30                ← SQL: janela 16–15
+└── automacao_mail/
+    ├── CONTEXTO.md
+    ├── main.py             ← orquestração (CLI)
+    ├── config.py           ← paths, load_dotenv, connection_string
+    ├── database.py         ← prepare_sql, run_query
+    ├── excel_export.py     ← prepare_detail_dataframe, abas Detalhe + Resumo
+    ├── email_send.py       ← SMTP, anexos .xlsx, corpo texto
+    ├── requirements.txt
+    ├── .gitignore          ← reforço local (mesma política)
+    ├── .env.example        ← nomes das variáveis (versionar; sem segredos)
+    ├── .env                ← credenciais reais (não versionar)
+    ├── saida/              ← relatórios gerados (não versionar)
+    └── ...
 ```
 
 ---
@@ -169,9 +174,30 @@ Use a seção abaixo como log cronológico (copie o bloco modelo para cada entra
 
 ---
 
+### 2026-05-11 — GitHub + política de segredos
+
+- Código publicado em **GitHub**: repositório `GabaAraujo/Automa-o_Envio`, branch `main` (histórico local unificado com o commit inicial do GitHub via merge *unrelated histories*).
+- **`.gitignore`** na raiz do projeto e em `automacao_mail/`: não versionar `.env`, `*.ppk` / chaves, `saida/`, venvs e caches.
+- **`.env.example`**: template das variáveis para novos clones (sem valores sensíveis).
+- Tabela de variáveis de ambiente neste arquivo atualizada com coluna **“Onde é lida”** (`config.py` / `email_send.py`).
+
+---
+
+## Repositório Git (código público)
+
+| Campo | Valor |
+|--------|--------|
+| **GitHub** | [https://github.com/GabaAraujo/Automa-o_Envio](https://github.com/GabaAraujo/Automa-o_Envio) |
+| **Branch principal** | `main` |
+| **Clone** | `git clone https://github.com/GabaAraujo/Automa-o_Envio.git` |
+
+Após clonar: copiar `automacao_mail/.env.example` para `automacao_mail/.env` e preencher. Não commitar `.env`, chaves (`.ppk`, `.pem`, etc.) nem pasta `saida/` com relatórios.
+
+---
+
 ## Links e referências internas
 
-- Queries SQL: `Consultas/d-1`, `Consultas/d-30` (pasta pai de `automacao_mail`).
+- Queries SQL: `Consultas/d-1`, `Consultas/d-30` (mesmo nível de `automacao_mail/` na raiz do repositório).
 
 ---
 
