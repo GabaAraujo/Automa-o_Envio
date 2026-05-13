@@ -11,8 +11,13 @@ Wants=network-online.target
 [Service]
 Type=oneshot
 User=ubuntu
+# main.py fica em automacao_mail/ (não na raiz do clone). cd explícito evita falha se WorkingDirectory for ignorado.
 WorkingDirectory=/opt/relatorio-vix/Automa-o_Envio/automacao_mail
-ExecStart=/opt/relatorio-vix/Automa-o_Envio/automacao_mail/scripts/run_relatorio.sh
+ExecStart=/bin/bash -lc 'cd /opt/relatorio-vix/Automa-o_Envio/automacao_mail && exec /usr/bin/python3 main.py --email'
+# Alternativa com log via script (precisa de scripts/run_relatorio.sh + chmod +x):
+# ExecStart=/opt/relatorio-vix/Automa-o_Envio/automacao_mail/scripts/run_relatorio.sh
+# Se usar só o venv (sem pacotes no python3 global), troque /usr/bin/python3 pelo caminho:
+# .../automacao_mail/.venv/bin/python
 
 [Install]
 WantedBy=multi-user.target
